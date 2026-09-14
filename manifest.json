@@ -1,6 +1,6 @@
 {
-  "name": "Supervisión Vivienda Cochamó",
-  "short_name": "Supervisión",
+  "name": "Reporte de Avance · Cochamó",
+  "short_name": "Avance",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#0f4c81",

@@ -1,9 +1,8 @@
-const CACHE = 'cochamo-v12';
+const CACHE = 'avance-cochamo-v3';
 const ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  './vendor/jspdf.umd.min.js',
   './logo.jpeg',
   './icon.png'
 ];
