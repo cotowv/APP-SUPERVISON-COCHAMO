@@ -1,4 +1,4 @@
-const CACHE = 'cochamo-supervision-v1';
+const CACHE = 'cochamo-supervision-v2';
 const ASSETS = [
   './',
   './index.html',

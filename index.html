@@ -586,17 +586,6 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   .opt.on.no{background:var(--no)}
   .opt.on.obs{background:var(--mid)}
 
-  /* ---------- Plano del beneficiario ---------- */
-  .plano-box{margin-top:14px}
-  .plano-preview{
-    margin-top:10px;border:1.5px dashed var(--line);border-radius:var(--radius-sm);
-    padding:10px;text-align:center;background:var(--surface-2);
-  }
-  .plano-preview img{max-width:100%;border-radius:8px;display:block;margin:0 auto}
-  .plano-preview .doc{padding:12px;color:var(--ink-2);font-size:13.5px}
-  .btn-file{position:relative;overflow:hidden}
-  .btn-file input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
-
   /* ---------- Observación + fotos ---------- */
   .sub-lbl{font-size:11.5px;font-weight:600;color:var(--ink-2);margin:14px 0 7px}
   textarea.input{resize:vertical;min-height:52px;line-height:1.4}
@@ -627,8 +616,10 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   .saved-row .avatar{width:38px;height:38px;border-radius:9px;background:var(--brand-050);color:var(--brand);font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
   .saved-row .info{flex:1;min-width:0}
   .saved-row .info b{font-size:14px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .saved-row .info span{font-size:11.5px;color:var(--ink-3)}
-  .saved-row .acts{display:flex;gap:6px;flex-shrink:0}
+  .saved-row .info span{font-size:11.5px;color:var(--ink-3);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .saved-row{flex-wrap:wrap}
+  .saved-row .acts{display:flex;gap:6px;flex-shrink:0;margin-left:auto}
+  .saved-row .acts .mini{padding:7px 9px;font-size:12.5px}
   .mini{border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:8px 11px;font-size:13px;font-weight:600;cursor:pointer;color:var(--brand)}
   .mini.danger{color:var(--danger);border-color:#f0d0ce}
   .empty{text-align:center;color:var(--ink-3);font-size:13.5px;padding:18px}
@@ -718,14 +709,6 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
       <label for="inspector">Supervisor</label>
       <input class="input" type="text" id="inspector" placeholder="Nombre" autocomplete="off">
     </div>
-    <div class="field plano-box">
-      <label for="planoInput">Plano del beneficiario (para comparar)</label>
-      <button class="mini btn-file" style="width:100%;padding:12px">
-        📄 Cargar plano (foto o PDF)
-        <input type="file" id="planoInput" accept="image/*,application/pdf">
-      </button>
-      <div class="plano-preview" id="planoPreview" style="display:none"></div>
-    </div>
     <div class="field" style="margin-top:14px;margin-bottom:0">
       <span style="font-size:12px;color:var(--ink-3)" id="fechaAuto"></span>
     </div>
@@ -758,10 +741,16 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   </details>
 </div>
 
+<div id="editBanner" style="display:none;position:fixed;left:0;right:0;bottom:76px;z-index:59;justify-content:center;padding:0 16px">
+  <div style="max-width:720px;width:100%;background:var(--brand-700);color:#fff;border-radius:10px;padding:8px 14px;font-size:12.5px;font-weight:600;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.2)">
+    ✎ Editando una supervisión guardada — al guardar se actualiza ese mismo registro
+  </div>
+</div>
+
 <div class="footer">
   <div class="footer-in">
     <button class="btn btn-ghost" onclick="nuevaInspeccion()">Nueva</button>
-    <button class="btn btn-primary" onclick="guardarYPDF()">Guardar y generar PDF</button>
+    <button class="btn btn-primary" id="btnGuardar" onclick="guardarYPDF()">Guardar y generar PDF</button>
   </div>
 </div>
 
@@ -820,7 +809,6 @@ function numGlobal(si,ii){
 const TOTAL_ITEMS = SECCIONES.reduce((a,s)=>a+s.items.length,0);
 
 let actual = nuevaEstructura();
-let planoData = null; // {tipo:'img'|'pdf', data, nombre, w, h}
 
 function nuevaEstructura(){
   const o = {};
@@ -945,26 +933,6 @@ function actualizarProgreso(){
   hn.textContent=(id||insp)?(id?('ID '+id):'')+(id&&insp?' · ':'')+(insp||''):'Sin datos aún';
 }
 
-// ---------- Plano ----------
-document.getElementById('planoInput').onchange=e=>{
-  const file=e.target.files[0]; if(!file) return;
-  if(file.type==='application/pdf'){
-    const r=new FileReader();
-    r.onload=ev=>{
-      planoData={tipo:'pdf',data:ev.target.result,nombre:file.name};
-      document.getElementById('planoPreview').style.display='block';
-      document.getElementById('planoPreview').innerHTML=`<div class="doc">📄 ${file.name}<br><small>PDF cargado — se adjunta al respaldo</small></div>`;
-    };
-    r.readAsDataURL(file);
-  }else{
-    comprimirImagen(file,1400,0.7).then(res=>{
-      planoData={tipo:'img',data:res.d,w:res.w,h:res.h,nombre:file.name};
-      document.getElementById('planoPreview').style.display='block';
-      document.getElementById('planoPreview').innerHTML=`<img src="${res.d}">`;
-    });
-  }
-};
-
 // ---------- Fecha ----------
 function setFecha(){
   const d=new Date();
@@ -993,6 +961,7 @@ function renderSaved(){
     row.innerHTML=`<div class="avatar">${ini}</div>
       <div class="info"><b>${ins.id||'(sin ID)'}</b><span>${ins.fecha||''} · ${ins.inspector||'—'}</span></div>
       <div class="acts">
+        <button class="mini" onclick="editarSupervision(${i})">Editar</button>
         <button class="mini" onclick="regenerarPDF(${i})">PDF</button>
         <button class="mini danger" onclick="borrar(${i})">✕</button>
       </div>`;
@@ -1000,7 +969,13 @@ function renderSaved(){
   });
 }
 
-function borrar(i){ if(!confirm('¿Borrar esta supervisión del teléfono?'))return; const arr=getSaved(); arr.splice(i,1); setSaved(arr); toast('Supervisión borrada'); }
+function borrar(i){
+  if(!confirm('¿Borrar esta supervisión del teléfono?'))return;
+  const arr=getSaved(); arr.splice(i,1); setSaved(arr);
+  if(editIndex===i){ editIndex=null; setEditBanner(false); }
+  else if(editIndex!==null && editIndex>i){ editIndex--; }
+  toast('Supervisión borrada');
+}
 
 // ---------- Guardar y PDF ----------
 function snapshot(){
@@ -1008,20 +983,49 @@ function snapshot(){
     id:document.getElementById('idVivienda').value.trim(),
     inspector:document.getElementById('inspector').value.trim(),
     fecha:actual._fecha,
-    plano:planoData,
     datos:JSON.parse(JSON.stringify(Object.fromEntries(Object.entries(actual).filter(([k])=>!k.startsWith('_')))))
   };
 }
+
+let editIndex = null; // null = supervisión nueva; número = editando ese registro guardado
 
 function guardarYPDF(){
   const id=document.getElementById('idVivienda').value.trim();
   if(!id){ toast('Ingresa el N° o ID de vivienda'); document.getElementById('idVivienda').focus(); return; }
   const snap=snapshot();
-  const arr=getSaved(); arr.push(snap); setSaved(arr);
-  toast('Guardado en el teléfono ✓');
+  const arr=getSaved();
+  if(editIndex!==null && arr[editIndex]){
+    arr[editIndex]=snap; setSaved(arr);
+    toast('Cambios guardados ✓');
+  }else{
+    arr.push(snap); setSaved(arr);
+    toast('Guardado en el teléfono ✓');
+  }
   generarPDF(snap);
 }
 function regenerarPDF(i){ generarPDF(getSaved()[i]); }
+
+function editarSupervision(i){
+  const arr=getSaved(); const ins=arr[i]; if(!ins) return;
+  editIndex=i;
+  actual=JSON.parse(JSON.stringify(ins.datos||{}));
+  SECCIONES.forEach((s,si)=>s.items.forEach((_,ii)=>{ const k=si+'-'+ii; if(!actual[k]) actual[k]={estado:null,obs:'',fotos:[]}; }));
+  actual._fecha=ins.fecha;
+  document.getElementById('idVivienda').value=ins.id||'';
+  document.getElementById('inspector').value=ins.inspector||'';
+  document.getElementById('fechaAuto').textContent='🕒 '+(ins.fecha||'');
+  renderChecklist();
+  setEditBanner(true);
+  window.scrollTo({top:0,behavior:'smooth'});
+  toast('Editando — los cambios se guardarán en esta misma supervisión');
+}
+
+function setEditBanner(on){
+  const b=document.getElementById('editBanner');
+  const btn=document.getElementById('btnGuardar');
+  if(b) b.style.display = on?'flex':'none';
+  if(btn) btn.textContent = on?'Guardar cambios y generar PDF':'Guardar y generar PDF';
+}
 
 /* ---------- PDF ---------- */
 function generarPDF(snap){
@@ -1113,19 +1117,6 @@ function generarPDF(snap){
     nl(4); doc.setDrawColor(232,237,242); doc.setLineWidth(0.3); doc.line(M,y,W-M,y); y+=5;
   });
 
-  // Plano
-  if(snap.plano && snap.plano.tipo==='img'){
-    doc.addPage(); y=20;
-    doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(15,76,129);
-    doc.text('Plano del beneficiario',M,y); doc.setTextColor(28,39,51);
-    const maxW=W-2*M, maxH=H-14-(y+6);
-    let iw=snap.plano.w||maxW, ih=snap.plano.h||maxW*0.75;
-    const scale=Math.min(maxW/iw,maxH/ih);
-    const dw=iw*scale, dh=ih*scale;
-    const ix=M+(maxW-dw)/2, iy=y+6;
-    try{ doc.addImage(snap.plano.data,'JPEG',ix,iy,dw,dh); }catch(e){}
-  }
-
   const pages=doc.internal.getNumberOfPages();
   for(let p=1;p<=pages;p++){ doc.setPage(p); doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(140,150,160);
     doc.text('Proyecto Cochamó — Supervisión de vivienda   |   Página '+p+' de '+pages,W/2,H-8,{align:'center'}); }
@@ -1137,10 +1128,9 @@ function generarPDF(snap){
 // ---------- Nueva ----------
 function nuevaInspeccion(){
   if(!confirm('¿Comenzar una nueva supervisión? Se limpiará la pantalla actual (las guardadas se conservan).')) return;
-  actual=nuevaEstructura(); planoData=null;
+  actual=nuevaEstructura();
+  editIndex=null; setEditBanner(false);
   document.getElementById('idVivienda').value='';
-  document.getElementById('planoPreview').style.display='none';
-  document.getElementById('planoPreview').innerHTML='';
   setFecha(); renderChecklist(); window.scrollTo({top:0,behavior:'smooth'}); toast('Lista para nueva vivienda');
 }
 
