@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Reporte de Avance · Cochamó</title>
+<title>Supervisión de Vivienda · Cochamó</title>
 <link rel="manifest" href="manifest.json">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Avance">
+<meta name="apple-mobile-web-app-title" content="Supervisión">
 <meta name="theme-color" content="#0f4c81">
 <link rel="apple-touch-icon" href="icon.png">
 <script>
@@ -447,10 +447,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     --brand-700:#0c3e6b;
     --brand-050:#e8f0f7;
     --brand-100:#d3e3f0;
-    /* Estados de avance */
+    /* Estados de supervisión */
     --s0:#7a8797;   --s0-bg:#eef1f4;   --s0-line:#d4dbe2;
     --mid:#b26a00;  --mid-bg:#fbf1e0;  --mid-line:#f0d9b0;
     --ok:#1a7a4c;   --ok-bg:#e4f3ea;   --ok-line:#bfe3cd;
+    --no:#b3271e;   --no-bg:#fbe9e7;   --no-line:#f3c6c1;
     --danger:#b3271e;
     --radius:16px;
     --radius-sm:11px;
@@ -540,6 +541,11 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
   .sec-head{display:flex;align-items:baseline;gap:10px;margin:26px 4px 12px}
   .sec-head h2{font-size:15px;font-weight:700;margin:0;letter-spacing:-.1px}
   .sec-head .sub{font-size:12.5px;color:var(--ink-3);font-weight:500}
+  .sec-sub{
+    font-size:12px;font-weight:700;color:var(--brand);letter-spacing:.4px;
+    margin:20px 4px 10px;display:flex;align-items:center;gap:8px;
+  }
+  .sec-sub::after{content:"";flex:1;height:1px;background:var(--line)}
 
   /* ---------- Tarea ---------- */
   .task{
@@ -547,8 +553,9 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     box-shadow:var(--shadow-sm);margin-bottom:13px;overflow:hidden;
     border-left:4px solid var(--s0-line);transition:border-color .2s;
   }
-  .task[data-state="mid"]{border-left-color:var(--mid)}
+  .task[data-state="obs"]{border-left-color:var(--mid)}
   .task[data-state="ok"]{border-left-color:var(--ok)}
+  .task[data-state="no"]{border-left-color:var(--no)}
   .task-top{display:flex;align-items:flex-start;gap:12px;padding:15px 16px 0}
   .task-no{
     width:28px;height:28px;border-radius:8px;background:var(--brand-050);color:var(--brand);
@@ -561,33 +568,34 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     flex-shrink:0;font-size:12.5px;font-weight:700;padding:4px 10px;border-radius:20px;
     background:var(--s0-bg);color:var(--s0);border:1px solid var(--s0-line);min-width:44px;text-align:center;
   }
-  .task[data-state="mid"] .task-badge{background:var(--mid-bg);color:var(--mid);border-color:var(--mid-line)}
+  .task[data-state="obs"] .task-badge{background:var(--mid-bg);color:var(--mid);border-color:var(--mid-line)}
   .task[data-state="ok"] .task-badge{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-line)}
+  .task[data-state="no"] .task-badge{background:var(--no-bg);color:var(--no);border-color:var(--no-line)}
   .task-body{padding:13px 16px 16px}
 
   .pct-lbl{font-size:11.5px;font-weight:600;color:var(--ink-2);margin:0 0 7px}
-  .pcts{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
-  .pct{
-    border:1.5px solid var(--line);border-radius:10px;padding:11px 2px;text-align:center;
-    font-size:14px;font-weight:700;color:var(--ink-2);cursor:pointer;background:var(--surface-2);
+  .opts{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+  .opt{
+    border:1.5px solid var(--line);border-radius:10px;padding:11px 4px;text-align:center;
+    font-size:13.5px;font-weight:700;color:var(--ink-2);cursor:pointer;background:var(--surface-2);
     transition:.12s;user-select:none;
   }
-  .pct:active{transform:scale(.96)}
-  .pct.on{color:#fff;border-color:transparent}
-  .pct.on[data-v="0"]{background:var(--s0)}
-  .pct.on[data-v="25"],.pct.on[data-v="50"],.pct.on[data-v="75"]{background:var(--mid)}
-  .pct.on[data-v="100"]{background:var(--ok)}
+  .opt:active{transform:scale(.96)}
+  .opt.on{color:#fff;border-color:transparent}
+  .opt.on.ok{background:var(--ok)}
+  .opt.on.no{background:var(--no)}
+  .opt.on.obs{background:var(--mid)}
 
-  /* ---------- Conteo ---------- */
-  .count-box{margin-top:14px;background:var(--surface-2);border:1px solid var(--line-2);border-radius:var(--radius-sm);padding:13px}
-  .count-box .cb-h{font-size:11.5px;font-weight:700;color:var(--brand);margin-bottom:10px;display:flex;align-items:center;gap:6px}
-  .count-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-  .count-cell label{display:block;font-size:10.5px;font-weight:600;color:var(--ink-3);margin-bottom:5px;text-align:center}
-  .count-cell input{
-    width:100%;padding:11px 4px;border:1.5px solid var(--line);border-radius:9px;
-    font-size:18px;font-family:inherit;background:#fff;color:var(--ink);text-align:center;font-weight:700;
+  /* ---------- Plano del beneficiario ---------- */
+  .plano-box{margin-top:14px}
+  .plano-preview{
+    margin-top:10px;border:1.5px dashed var(--line);border-radius:var(--radius-sm);
+    padding:10px;text-align:center;background:var(--surface-2);
   }
-  .count-cell input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-050)}
+  .plano-preview img{max-width:100%;border-radius:8px;display:block;margin:0 auto}
+  .plano-preview .doc{padding:12px;color:var(--ink-2);font-size:13.5px}
+  .btn-file{position:relative;overflow:hidden}
+  .btn-file input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
 
   /* ---------- Observación + fotos ---------- */
   .sub-lbl{font-size:11.5px;font-weight:600;color:var(--ink-2);margin:14px 0 7px}
@@ -670,7 +678,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
     <img class="head-logo" src="logo.jpeg" alt="Ciudad Luz">
     <div class="head-txt">
       <p class="head-org">SERVICIOS DE ENERGÍA CIUDAD LUZ</p>
-      <h1 class="head-title">Reporte de Avance Diario</h1>
+      <h1 class="head-title">Supervisión de Vivienda</h1>
       <p class="head-sub"><span class="dot-live"></span> Proyecto Cochamó · funciona sin conexión</p>
     </div>
   </div>
@@ -678,7 +686,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
 <div class="wrap">
 
-  <!-- Héroe: avance global -->
+  <!-- Héroe: avance de la revisión -->
   <div class="hero">
     <div class="ring">
       <svg width="96" height="96" viewBox="0 0 96 96">
@@ -686,37 +694,37 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
         <circle id="ringFill" cx="48" cy="48" r="42" fill="none" stroke="#5fd39a" stroke-width="8"
                 stroke-linecap="round" stroke-dasharray="263.9" stroke-dashoffset="263.9"/>
       </svg>
-      <div class="val"><b id="ringPct">0%</b><span>avance</span></div>
+      <div class="val"><b id="ringPct">0%</b><span>revisado</span></div>
     </div>
     <div class="hero-info">
-      <div class="lbl">AVANCE DE LA VIVIENDA</div>
+      <div class="lbl">AVANCE DE LA SUPERVISIÓN</div>
       <div class="big" id="heroName">Sin datos aún</div>
       <div class="hero-stats">
-        <span class="chip">✓ <span id="statDone">0</span>/10 tareas</span>
-        <span class="chip">📷 <span id="statPhotos">0</span> fotos</span>
+        <span class="chip" style="background:rgba(31,180,120,.18);border-color:rgba(31,180,120,.3)">✓ <span id="statOk">0</span></span>
+        <span class="chip" style="background:rgba(211,80,68,.2);border-color:rgba(211,80,68,.32)">✗ <span id="statNo">0</span></span>
+        <span class="chip" style="background:rgba(214,150,20,.2);border-color:rgba(214,150,20,.32)">⚠ <span id="statObs">0</span></span>
+        <span class="chip">📷 <span id="statPhotos">0</span></span>
       </div>
     </div>
   </div>
 
-  <!-- Datos del día -->
+  <!-- Datos de la casa -->
   <div class="card card-pad">
     <div class="field">
-      <label for="idVivienda">ID de vivienda</label>
-      <input class="input" type="text" id="idVivienda" placeholder="Ej: 175" autocomplete="off" inputmode="numeric">
+      <label for="idVivienda">N° o ID de vivienda</label>
+      <input class="input" type="text" id="idVivienda" placeholder="Ej: Casa 042 / Beneficiario ..." autocomplete="off">
     </div>
     <div class="field">
-      <label for="beneficiario">Nombre del beneficiario</label>
-      <input class="input" type="text" id="beneficiario" placeholder="Nombre completo" autocomplete="off">
+      <label for="inspector">Supervisor</label>
+      <input class="input" type="text" id="inspector" placeholder="Nombre" autocomplete="off">
     </div>
-    <div class="grid2">
-      <div class="field">
-        <label for="jefe">Jefe de cuadrilla</label>
-        <input class="input" type="text" id="jefe" placeholder="Tu nombre" autocomplete="off">
-      </div>
-      <div class="field">
-        <label for="sector">Sector</label>
-        <input class="input" type="text" id="sector" placeholder="Ej: El Mazazo" autocomplete="off">
-      </div>
+    <div class="field plano-box">
+      <label for="planoInput">Plano del beneficiario (para comparar)</label>
+      <button class="mini btn-file" style="width:100%;padding:12px">
+        📄 Cargar plano (foto o PDF)
+        <input type="file" id="planoInput" accept="image/*,application/pdf">
+      </button>
+      <div class="plano-preview" id="planoPreview" style="display:none"></div>
     </div>
     <div class="field" style="margin-top:14px;margin-bottom:0">
       <span style="font-size:12px;color:var(--ink-3)" id="fechaAuto"></span>
@@ -725,20 +733,20 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
   <!-- Checklist -->
   <div class="sec-head">
-    <h2>Tareas ejecutadas hoy</h2>
-    <span class="sub">toca el % de cada una</span>
+    <h2>Revisión por ítem</h2>
+    <span class="sub">toca el estado de cada punto</span>
   </div>
   <div id="checklist"></div>
 
-  <!-- Guardados -->
+  <!-- Guardadas -->
   <details class="card">
     <summary>
-      <span>📁 Reportes guardados</span>
+      <span>📁 Supervisiones guardadas</span>
       <span class="chip" style="background:var(--brand-050);color:var(--brand);border-color:var(--brand-100)"><span id="savedCount">0</span></span>
       <svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 6l6 6-6 6"/></svg>
     </summary>
     <div class="saved-inner">
-      <div id="savedList"><div class="empty">Aún no hay reportes guardados en este teléfono.</div></div>
+      <div id="savedList"><div class="empty">Aún no hay supervisiones guardadas.</div></div>
       <div class="backup-row">
         <button class="mini" style="width:100%" onclick="exportAllJSON()">⬇ Respaldar todo</button>
         <label class="mini" style="text-align:center;position:relative;overflow:hidden">
@@ -752,7 +760,7 @@ function(t){t.__bidiEngine__=t.prototype.__bidiEngine__=function(t){var r,n,i,a,
 
 <div class="footer">
   <div class="footer-in">
-    <button class="btn btn-ghost" onclick="nuevoReporte()">Nuevo</button>
+    <button class="btn btn-ghost" onclick="nuevaInspeccion()">Nueva</button>
     <button class="btn btn-primary" onclick="guardarYPDF()">Guardar y generar PDF</button>
   </div>
 </div>
@@ -765,103 +773,119 @@ const { jsPDF } = window.jspdf;
 // Logo incrustado en base64 para que el PDF lo incluya siempre, incluso sin conexión
 const LOGO_DATA = "data:image/jpeg;base64,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";
 
-const TAREAS = [
-  { id:'luminarias',    nombre:'Instalación de luminarias', count:true, unidad:'luminarias' },
-  { id:'enchufes',      nombre:'Instalación de enchufes', count:true, unidad:'enchufes' },
-  { id:'interruptores', nombre:'Instalación de interruptores', count:true, unidad:'interruptores' },
-  { id:'bandejas',      nombre:'Instalación de bandejas / cajas de derivación', hint:'Cruzadas, cajas chuqui destapadas', count:false },
-  { id:'pasadas',       nombre:'Pasadas de muro', count:false },
-  { id:'cableado_tda',  nombre:'Cableado de tablero (TDA)', count:false },
-  { id:'falsos_polos',  nombre:'Tablero con falsos polos', count:false },
-  { id:'pat_servicio',  nombre:'Puesta a tierra con tierra de servicio', count:false },
-  { id:'canal_pat',     nombre:'Canalización de puesta a tierra', count:false },
-  { id:'modulos_fv',    nombre:'Instalación de módulos fotovoltaicos', count:false },
+const SECCIONES = [
+  { titulo:"Estructura de montaje y cerco perimetral", items:[
+    "Revisión posición de estructura y cerco en función a la planimetría",
+    "Cerco perimetral firme",
+    "Puerta de acceso instalada",
+    "Tres líneas de alambre de púas instaladas",
+    "Polines pintados con carbonileo",
+    "Polines expuestos cortados en 45°",
+  ]},
+  { titulo:"Placas solares", items:[
+    "Módulos instalados y alineados",
+  ]},
+  { titulo:"Planimetría", items:[
+    "Enchufes ubicados según planimetría",
+    "Ampolletas y luminarias ubicadas según planimetría",
+    "Interruptores ubicados según planimetría",
+    "Tablero (TDA) ubicado según planimetría",
+  ]},
+  { titulo:"Interior", items:[
+    "Que todas las pasadas por muro cuenten con tubería PVC o moldura",
+    "Que todos los empalmes lleven cinta aislante en los conectores cónicos",
+    "Que no haya canalizaciones superpuestas (una encima de otra), exceptuando canalizaciones existentes",
+    "Que el TDA esté firmemente anclado",
+    "Cableado TDA correcto",
+    "Falsos polos instalados en TDA",
+    "Energizar y probar funcionamiento del circuito interior",
+    "Que no existan canalizaciones dañadas o sin cerrar",
+    "Equipos pendientes de instalación",
+    "Cajas de derivación a las que entra PVC cuentan con terminal de PVC",
+  ]},
+  { titulo:"Puesta a tierra", items:[
+    "Cámara de registro ejecutada según indica el plano",
+    "Instalación correcta de conduit desde la casa hasta la puesta a tierra",
+  ]},
 ];
-const PCTS = [0,25,50,75,100];
 const RING_C = 263.9;
+const ETIQUETA = { ok:'CUMPLE', no:'NO CUMPLE', obs:'CON OBSERVACIONES', null:'—' };
+
+// Número correlativo global (1..N) a partir de sección e índice
+function numGlobal(si,ii){
+  let n=0;
+  for(let s=0;s<si;s++) n+=SECCIONES[s].items.length;
+  return n+ii+1;
+}
+const TOTAL_ITEMS = SECCIONES.reduce((a,s)=>a+s.items.length,0);
 
 let actual = nuevaEstructura();
+let planoData = null; // {tipo:'img'|'pdf', data, nombre, w, h}
 
 function nuevaEstructura(){
   const o = {};
-  TAREAS.forEach(t=>{
-    o[t.id] = { pct:null, obs:"", fotos:[] };
-    if(t.count) o[t.id].conteo = { hoy:"", acum:"", total:"" };
-  });
+  SECCIONES.forEach((s,si)=>s.items.forEach((_,ii)=>{ o[si+"-"+ii]={estado:null,obs:"",fotos:[]}; }));
   return o;
 }
 
-function stateOf(pct){ if(pct===null) return 's0'; if(pct===100) return 'ok'; if(pct>0) return 'mid'; return 's0'; }
-
+// ---------- Render checklist ----------
 function renderChecklist(){
   const cont = document.getElementById('checklist');
   cont.innerHTML = "";
-  TAREAS.forEach((tar,i)=>{
-    const st = actual[tar.id];
-    const stt = stateOf(st.pct);
-    const task = document.createElement('div');
-    task.className='task';
-    task.dataset.state = stt;
-    task.id = 'task-'+tar.id;
-
-    let countHTML='';
-    if(tar.count){
-      const c=st.conteo;
-      countHTML = `
-        <div class="count-box">
-          <div class="cb-h">▦ Conteo de ${tar.unidad}</div>
-          <div class="count-grid">
-            <div class="count-cell"><label>Instalado hoy</label><input type="text" inputmode="numeric" data-count="${tar.id}" data-field="hoy" value="${c.hoy}"></div>
-            <div class="count-cell"><label>Acumulado</label><input type="text" inputmode="numeric" data-count="${tar.id}" data-field="acum" value="${c.acum}"></div>
-            <div class="count-cell"><label>Total proyecto</label><input type="text" inputmode="numeric" data-count="${tar.id}" data-field="total" value="${c.total}"></div>
+  SECCIONES.forEach((sec,si)=>{
+    const t = document.createElement('div');
+    t.className='sec-sub';
+    t.textContent = sec.titulo;
+    cont.appendChild(t);
+    sec.items.forEach((q,ii)=>{
+      const key = si+"-"+ii;
+      const st = actual[key];
+      const task = document.createElement('div');
+      task.className='task';
+      task.dataset.state = st.estado || 's0';
+      task.id = 'task-'+key;
+      task.innerHTML = `
+        <div class="task-top">
+          <div class="task-no">${numGlobal(si,ii)}</div>
+          <div class="task-ttl">
+            <div class="name">${q}</div>
           </div>
+          <div class="task-badge" id="badge-${key}">${st.estado?ETIQUETA[st.estado]:'—'}</div>
+        </div>
+        <div class="task-body">
+          <div class="pct-lbl">Estado</div>
+          <div class="opts">
+            <div class="opt ok ${st.estado==='ok'?'on':''}" data-k="${key}" data-v="ok">Cumple</div>
+            <div class="opt no ${st.estado==='no'?'on':''}" data-k="${key}" data-v="no">No cumple</div>
+            <div class="opt obs ${st.estado==='obs'?'on':''}" data-k="${key}" data-v="obs">Con obs.</div>
+          </div>
+          <div class="sub-lbl">Observación</div>
+          <textarea class="input" placeholder="Observación (opcional)…" data-obs="${key}">${st.obs||""}</textarea>
+          <div class="sub-lbl">Fotografías</div>
+          <div class="photos" id="ps-${key}"></div>
         </div>`;
-    }
-
-    task.innerHTML = `
-      <div class="task-top">
-        <div class="task-no">${i+1}</div>
-        <div class="task-ttl">
-          <div class="name">${tar.nombre}</div>
-          ${tar.hint?`<div class="hint">${tar.hint}</div>`:''}
-        </div>
-        <div class="task-badge" id="badge-${tar.id}">${st.pct!==null?st.pct+'%':'—'}</div>
-      </div>
-      <div class="task-body">
-        <div class="pct-lbl">Porcentaje de avance</div>
-        <div class="pcts">
-          ${PCTS.map(p=>`<div class="pct ${st.pct===p?'on':''}" data-t="${tar.id}" data-v="${p}">${p}%</div>`).join('')}
-        </div>
-        ${countHTML}
-        <div class="sub-lbl">Observación</div>
-        <textarea class="input" placeholder="Escribe una nota si es necesario…" data-obs="${tar.id}">${st.obs||""}</textarea>
-        <div class="sub-lbl">Fotografías</div>
-        <div class="photos" id="ps-${tar.id}"></div>
-      </div>`;
-    cont.appendChild(task);
-    renderFotos(tar.id);
+      cont.appendChild(task);
+      renderFotos(key);
+    });
   });
   bindOpts();
   actualizarProgreso();
 }
 
 function bindOpts(){
-  document.querySelectorAll('.pct').forEach(o=>{
+  document.querySelectorAll('.opt').forEach(o=>{
     o.onclick=()=>{
-      const k=o.dataset.t, v=parseInt(o.dataset.v,10);
-      actual[k].pct = (actual[k].pct===v)?null:v;
-      document.querySelectorAll(`.pct[data-t="${k}"]`).forEach(x=>x.classList.remove('on'));
-      if(actual[k].pct!==null) o.classList.add('on');
+      const k=o.dataset.k, v=o.dataset.v;
+      actual[k].estado = (actual[k].estado===v)?null:v;
+      document.querySelectorAll(`.opt[data-k="${k}"]`).forEach(x=>x.classList.remove('on'));
+      if(actual[k].estado) o.classList.add('on');
       const badge=document.getElementById('badge-'+k);
-      badge.textContent = actual[k].pct!==null?actual[k].pct+'%':'—';
-      document.getElementById('task-'+k).dataset.state = stateOf(actual[k].pct);
+      badge.textContent = actual[k].estado?ETIQUETA[actual[k].estado]:'—';
+      document.getElementById('task-'+k).dataset.state = actual[k].estado || 's0';
       actualizarProgreso();
     };
   });
   document.querySelectorAll('textarea[data-obs]').forEach(t=>{ t.oninput=()=>{ actual[t.dataset.obs].obs=t.value; }; });
-  document.querySelectorAll('input[data-count]').forEach(inp=>{
-    inp.oninput=()=>{ inp.value=inp.value.replace(/[^0-9]/g,''); actual[inp.dataset.count].conteo[inp.dataset.field]=inp.value; };
-  });
 }
 
 function renderFotos(key){
@@ -885,6 +909,7 @@ function agregarFoto(e,key){
   Promise.all(files.map(f=>comprimirImagen(f,900,0.6))).then(datas=>{ actual[key].fotos.push(...datas); renderFotos(key); actualizarProgreso(); });
 }
 
+// Compresión + guardamos ancho/alto reales para no deformar la foto en el PDF
 function comprimirImagen(file,maxW,quality){
   return new Promise(res=>{
     const r=new FileReader();
@@ -892,7 +917,6 @@ function comprimirImagen(file,maxW,quality){
       const scale=Math.min(1,maxW/img.width); const c=document.createElement('canvas');
       c.width=Math.round(img.width*scale); c.height=Math.round(img.height*scale);
       c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-      // Guardamos la imagen junto con sus dimensiones reales para no deformarla en el PDF
       res({ d:c.toDataURL('image/jpeg',quality), w:c.width, h:c.height });
     }; img.src=ev.target.result; };
     r.readAsDataURL(file);
@@ -900,44 +924,74 @@ function comprimirImagen(file,maxW,quality){
 }
 
 function actualizarProgreso(){
-  const vals=TAREAS.map(t=>actual[t.id]);
-  const conPct=vals.filter(v=>v.pct!==null);
-  const suma=conPct.reduce((a,v)=>a+v.pct,0);
-  const avg=Math.round(suma/TAREAS.length);
+  const entradas=Object.entries(actual).filter(([k])=>!k.startsWith('_'));
+  const vals=entradas.map(([,v])=>v);
+  const hechos=vals.filter(x=>x.estado).length;
+  const avg=Math.round(hechos/TOTAL_ITEMS*100);
   document.getElementById('prog').style.width=avg+"%";
   document.getElementById('ringPct').textContent=avg+"%";
-  document.getElementById('ringFill').style.strokeDashoffset = (RING_C*(1-avg/100)).toFixed(1);
+  document.getElementById('ringFill').style.strokeDashoffset=(RING_C*(1-avg/100)).toFixed(1);
+  const ok=vals.filter(x=>x.estado==='ok').length;
+  const no=vals.filter(x=>x.estado==='no').length;
+  const obs=vals.filter(x=>x.estado==='obs').length;
   const totalFotos=vals.reduce((a,v)=>a+v.fotos.length,0);
-  document.getElementById('statDone').textContent=conPct.length;
+  document.getElementById('statOk').textContent=ok;
+  document.getElementById('statNo').textContent=no;
+  document.getElementById('statObs').textContent=obs;
   document.getElementById('statPhotos').textContent=totalFotos;
   const id=document.getElementById('idVivienda').value.trim();
-  const ben=document.getElementById('beneficiario').value.trim();
+  const insp=document.getElementById('inspector').value.trim();
   const hn=document.getElementById('heroName');
-  hn.textContent = (ben||id)?((id?('ID '+id+' · '):'')+(ben||'')):'Sin datos aún';
+  hn.textContent=(id||insp)?(id?('ID '+id):'')+(id&&insp?' · ':'')+(insp||''):'Sin datos aún';
 }
 
+// ---------- Plano ----------
+document.getElementById('planoInput').onchange=e=>{
+  const file=e.target.files[0]; if(!file) return;
+  if(file.type==='application/pdf'){
+    const r=new FileReader();
+    r.onload=ev=>{
+      planoData={tipo:'pdf',data:ev.target.result,nombre:file.name};
+      document.getElementById('planoPreview').style.display='block';
+      document.getElementById('planoPreview').innerHTML=`<div class="doc">📄 ${file.name}<br><small>PDF cargado — se adjunta al respaldo</small></div>`;
+    };
+    r.readAsDataURL(file);
+  }else{
+    comprimirImagen(file,1400,0.7).then(res=>{
+      planoData={tipo:'img',data:res.d,w:res.w,h:res.h,nombre:file.name};
+      document.getElementById('planoPreview').style.display='block';
+      document.getElementById('planoPreview').innerHTML=`<img src="${res.d}">`;
+    });
+  }
+};
+
+// ---------- Fecha ----------
 function setFecha(){
   const d=new Date();
   actual._fecha=d.toLocaleString('es-CL',{dateStyle:'long',timeStyle:'short'});
   document.getElementById('fechaAuto').textContent='🕒 '+actual._fecha;
 }
 
-const STORE='avance_cochamo_reportes';
+// ---------- Guardado local ----------
+const STORE='cochamo_inspecciones';
 function getSaved(){ try{return JSON.parse(localStorage.getItem(STORE))||[]}catch(e){return []} }
-function setSaved(a){ try{localStorage.setItem(STORE,JSON.stringify(a));}catch(e){toast('⚠ No se pudo guardar (memoria llena o modo privado)');} renderSaved(); }
+function setSaved(a){
+  try{ localStorage.setItem(STORE,JSON.stringify(a)); }
+  catch(e){ toast('⚠ No se pudo guardar. Abre desde Archivos/Safari, no desde WhatsApp.'); }
+  renderSaved();
+}
 
 function renderSaved(){
   const arr=getSaved();
   document.getElementById('savedCount').textContent=arr.length;
   const list=document.getElementById('savedList');
-  if(!arr.length){ list.innerHTML='<div class="empty">Aún no hay reportes guardados en este teléfono.</div>'; return; }
+  if(!arr.length){ list.innerHTML='<div class="empty">Aún no hay supervisiones guardadas.</div>'; return; }
   list.innerHTML='';
-  arr.forEach((r,i)=>{
-    const ini=((r.beneficiario||'?').trim()[0]||'?').toUpperCase();
+  arr.forEach((ins,i)=>{
+    const ini=((ins.id||'?').trim()[0]||'?').toUpperCase();
     const row=document.createElement('div'); row.className='saved-row';
     row.innerHTML=`<div class="avatar">${ini}</div>
-      <div class="info"><b>[${r.id||'—'}] ${r.beneficiario||'(sin nombre)'}</b>
-      <span>${r.fecha||''} · ${r.avance!=null?r.avance+'%':''}</span></div>
+      <div class="info"><b>${ins.id||'(sin ID)'}</b><span>${ins.fecha||''} · ${ins.inspector||'—'}</span></div>
       <div class="acts">
         <button class="mini" onclick="regenerarPDF(${i})">PDF</button>
         <button class="mini danger" onclick="borrar(${i})">✕</button>
@@ -945,25 +999,23 @@ function renderSaved(){
     list.appendChild(row);
   });
 }
-function borrar(i){ if(!confirm('¿Borrar este reporte del teléfono?'))return; const a=getSaved(); a.splice(i,1); setSaved(a); toast('Reporte borrado'); }
 
-function avanceGlobal(datos){ const s=TAREAS.reduce((a,t)=>a+((datos[t.id]&&datos[t.id].pct)||0),0); return Math.round(s/TAREAS.length); }
+function borrar(i){ if(!confirm('¿Borrar esta supervisión del teléfono?'))return; const arr=getSaved(); arr.splice(i,1); setSaved(arr); toast('Supervisión borrada'); }
 
+// ---------- Guardar y PDF ----------
 function snapshot(){
-  const datos=JSON.parse(JSON.stringify(Object.fromEntries(Object.entries(actual).filter(([k])=>!k.startsWith('_')))));
   return {
     id:document.getElementById('idVivienda').value.trim(),
-    beneficiario:document.getElementById('beneficiario').value.trim(),
-    jefe:document.getElementById('jefe').value.trim(),
-    sector:document.getElementById('sector').value.trim(),
-    fecha:actual._fecha, avance:avanceGlobal(datos), datos:datos
+    inspector:document.getElementById('inspector').value.trim(),
+    fecha:actual._fecha,
+    plano:planoData,
+    datos:JSON.parse(JSON.stringify(Object.fromEntries(Object.entries(actual).filter(([k])=>!k.startsWith('_')))))
   };
 }
 
 function guardarYPDF(){
   const id=document.getElementById('idVivienda').value.trim();
-  const ben=document.getElementById('beneficiario').value.trim();
-  if(!id && !ben){ toast('Ingresa el ID o el nombre del beneficiario'); document.getElementById('idVivienda').focus(); return; }
+  if(!id){ toast('Ingresa el N° o ID de vivienda'); document.getElementById('idVivienda').focus(); return; }
   const snap=snapshot();
   const arr=getSaved(); arr.push(snap); setSaved(arr);
   toast('Guardado en el teléfono ✓');
@@ -971,57 +1023,66 @@ function guardarYPDF(){
 }
 function regenerarPDF(i){ generarPDF(getSaved()[i]); }
 
-/* ---------- PDF (formato reporte fotográfico) ---------- */
+/* ---------- PDF ---------- */
 function generarPDF(snap){
   const doc=new jsPDF({unit:'mm',format:'a4'});
   const W=210,H=297,M=14; let y=0;
+  const entradas=Object.entries(snap.datos||{});
+  const hechos=entradas.filter(([,v])=>v.estado).length;
+  const avance=Math.round(hechos/TOTAL_ITEMS*100);
+  const ok=entradas.filter(([,v])=>v.estado==='ok').length;
+  const no=entradas.filter(([,v])=>v.estado==='no').length;
+  const obs=entradas.filter(([,v])=>v.estado==='obs').length;
+
   doc.setFillColor(15,76,129); doc.rect(0,0,W,26,'F');
   const logoS=18, logoX=W-M-logoS, logoY=4;
   doc.setFillColor(255,255,255); doc.roundedRect(logoX,logoY,logoS,logoS,2,2,'F');
   try{ doc.addImage(LOGO_DATA,'JPEG',logoX+1,logoY+1,logoS-2,logoS-2); }catch(e){}
   doc.setTextColor(255); doc.setFont('helvetica','bold'); doc.setFontSize(14);
-  doc.text('Reporte de Avance Diario · Proyecto Cochamó',M,12);
+  doc.text('Supervisión de Vivienda · Proyecto Cochamó',M,12);
   doc.setFont('helvetica','normal'); doc.setFontSize(9);
   doc.text('Servicios de Energía Ciudad Luz SpA',M,18);
-  doc.text((snap.sector?('Sector: '+snap.sector+'   |   '):'')+'Jefe de cuadrilla: '+(snap.jefe||'—')+'   |   '+(snap.fecha||''),M,23);
+  doc.text('Vivienda: '+(snap.id||'—')+'   |   Supervisor: '+(snap.inspector||'—')+'   |   '+(snap.fecha||''),M,23);
   y=34; doc.setTextColor(28,39,51);
-
-  doc.setFillColor(224,236,247); doc.rect(M,y,W-2*M,9,'F');
-  doc.setDrawColor(15,76,129); doc.setLineWidth(1.4); doc.line(M,y,M,y+9); doc.setLineWidth(0.2);
-  doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(15,76,129);
-  doc.text('[ID '+(snap.id||'0')+']  '+(snap.beneficiario||'(sin nombre)'),M+4,y+6);
-  y+=13; doc.setTextColor(28,39,51);
 
   doc.setFillColor(238,243,248); doc.roundedRect(M,y,W-2*M,14,2,2,'F');
   doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(15,76,129);
-  doc.text('AVANCE GLOBAL DE LA VIVIENDA',M+4,y+6);
+  doc.text('AVANCE DE LA SUPERVISIÓN',M+4,y+6);
   doc.setFontSize(16); doc.setTextColor(26,122,76);
-  doc.text((snap.avance!=null?snap.avance:0)+'%',W-M-4,y+9,{align:'right'});
+  doc.text(avance+'%',W-M-4,y+9,{align:'right'});
   const bx=M+4,bw=W-2*M-8,by=y+10,bh=2.5;
   doc.setFillColor(215,222,230); doc.rect(bx,by,bw,bh,'F');
-  doc.setFillColor(26,122,76); doc.rect(bx,by,bw*((snap.avance||0)/100),bh,'F');
-  y+=20; doc.setTextColor(28,39,51);
+  doc.setFillColor(26,122,76); doc.rect(bx,by,bw*(avance/100),bh,'F');
+  y+=18;
+  doc.setFont('helvetica','bold'); doc.setFontSize(8.6);
+  doc.setTextColor(26,122,76); doc.text('Cumple: '+ok,M,y);
+  doc.setTextColor(179,39,30); doc.text('No cumple: '+no,M+45,y);
+  doc.setTextColor(168,114,10); doc.text('Con obs.: '+obs,M+95,y);
+  y+=8; doc.setTextColor(28,39,51);
 
   const nl=(n)=>{ if(y+n>H-14){ doc.addPage(); y=18; } };
 
-  TAREAS.forEach((tar,i)=>{
-    const st=snap.datos[tar.id]||{pct:null,obs:'',fotos:[]};
-    const fotos=st.fotos||[]; nl(16);
-    doc.setFont('helvetica','bold'); doc.setFontSize(10.5); doc.setTextColor(28,39,51);
-    const tLines=doc.splitTextToSize((i+1)+'. '+tar.nombre,150); doc.text(tLines,M,y+4);
-    const pct=st.pct!=null?st.pct:0;
-    const pcol=st.pct===100?[26,122,76]:(st.pct>0?[178,106,0]:[122,135,151]);
-    doc.setFontSize(11); doc.setTextColor(...pcol);
-    doc.text((st.pct!=null?pct+'%':'—'),W-M,y+4,{align:'right'});
-    y+=tLines.length*4.6+1; doc.setTextColor(28,39,51);
+  const nombres = SECCIONES.flatMap((s,si)=>s.items.map((q,ii)=>({key:si+'-'+ii,q,sec:s.titulo,si,ii})));
+  let secActual='';
 
-    if(tar.count && st.conteo){
-      const c=st.conteo;
-      const txt='Instalado hoy: '+(c.hoy||'0')+'   |   Acumulado: '+(c.acum||'0')+'   |   Total proyecto: '+(c.total||'—');
-      nl(7); doc.setFillColor(246,248,250); doc.rect(M,y,W-2*M,6.5,'F');
-      doc.setFont('helvetica','bold'); doc.setFontSize(8.6); doc.setTextColor(15,76,129);
-      doc.text(txt,M+2,y+4.4); y+=8; doc.setTextColor(28,39,51);
+  nombres.forEach(({key,q,sec,si,ii})=>{
+    const st=snap.datos[key]||{estado:null,obs:'',fotos:[]};
+    const num=numGlobal(si,ii);
+    const fotos=st.fotos||[];
+    if(sec!==secActual){
+      secActual=sec; nl(11);
+      doc.setFillColor(238,243,248); doc.rect(M,y,W-2*M,7,'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(15,76,129);
+      doc.text(sec.toUpperCase(),M+2,y+5); y+=10; doc.setTextColor(28,39,51);
     }
+    nl(10);
+    doc.setFont('helvetica','bold'); doc.setFontSize(10.5); doc.setTextColor(28,39,51);
+    const qLines=doc.splitTextToSize(num+'. '+q,150); doc.text(qLines,M,y+4);
+    const pcol=st.estado==='ok'?[26,122,76]:st.estado==='no'?[179,39,30]:st.estado==='obs'?[168,114,10]:[122,135,151];
+    doc.setFontSize(9); doc.setTextColor(...pcol);
+    doc.text(ETIQUETA[st.estado]||'—',W-M,y+4,{align:'right'});
+    y+=qLines.length*4.6+1; doc.setTextColor(28,39,51);
+
     if(st.obs){
       const oLines=doc.splitTextToSize('Obs: '+st.obs,W-2*M-4);
       nl(oLines.length*3.8+2); doc.setFont('helvetica','italic'); doc.setFontSize(8.6); doc.setTextColor(74,90,106);
@@ -1030,30 +1091,19 @@ function generarPDF(snap){
     if(fotos.length){
       // Celda fija; la imagen se ajusta DENTRO manteniendo su proporción (sin deformar).
       const cols=2, gap=6, cellW=(W-2*M-gap)/cols;
-      const pad=4;                 // margen interno de la celda
-      const capH=6;                // espacio para el texto "Fotografía N"
-      const boxW=cellW-2*pad;      // ancho disponible para la imagen
-      const boxH=52;               // alto disponible para la imagen (más generoso para verticales)
-      const cellH=boxH+capH+pad;   // alto total de la celda
+      const pad=4, capH=6, boxW=cellW-2*pad, boxH=52, cellH=boxH+capH+pad;
       for(let f=0;f<fotos.length;f++){
         const col=f%cols; if(col===0) nl(cellH+3);
         const x=M+col*(cellW+gap), cy=y;
-        // marco de la celda
         doc.setDrawColor(210,218,226); doc.setLineWidth(0.3); doc.rect(x,cy,cellW,cellH);
-        // datos de la foto (compatibilidad con formato antiguo: string directo)
-        const fdat = fotos[f];
-        const src  = (fdat && fdat.d) ? fdat.d : fdat;
-        let iw = (fdat && fdat.w) ? fdat.w : 4;
-        let ih = (fdat && fdat.h) ? fdat.h : 3;
-        // escala para encajar dentro del área manteniendo proporción
-        const scale = Math.min(boxW/iw, boxH/ih);
-        const dw = iw*scale, dh = ih*scale;
-        // centrar la imagen dentro del área
-        const ix = x + pad + (boxW-dw)/2;
-        const iy = cy + pad + (boxH-dh)/2;
+        const fdat=fotos[f];
+        const src=(fdat&&fdat.d)?fdat.d:fdat;
+        let iw=(fdat&&fdat.w)?fdat.w:4, ih=(fdat&&fdat.h)?fdat.h:3;
+        const scale=Math.min(boxW/iw,boxH/ih);
+        const dw=iw*scale, dh=ih*scale;
+        const ix=x+pad+(boxW-dw)/2, iy=cy+pad+(boxH-dh)/2;
         try{ doc.addImage(src,'JPEG',ix,iy,dw,dh,undefined,'FAST'); }
         catch(e){ doc.setDrawColor(210,218,226); doc.rect(x+pad,cy+pad,boxW,boxH); }
-        // caption
         doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(120,132,144);
         doc.text('Fotografía '+(f+1),x+cellW/2,cy+cellH-2.2,{align:'center'});
         doc.setTextColor(28,39,51);
@@ -1063,29 +1113,45 @@ function generarPDF(snap){
     nl(4); doc.setDrawColor(232,237,242); doc.setLineWidth(0.3); doc.line(M,y,W-M,y); y+=5;
   });
 
+  // Plano
+  if(snap.plano && snap.plano.tipo==='img'){
+    doc.addPage(); y=20;
+    doc.setFont('helvetica','bold'); doc.setFontSize(12); doc.setTextColor(15,76,129);
+    doc.text('Plano del beneficiario',M,y); doc.setTextColor(28,39,51);
+    const maxW=W-2*M, maxH=H-14-(y+6);
+    let iw=snap.plano.w||maxW, ih=snap.plano.h||maxW*0.75;
+    const scale=Math.min(maxW/iw,maxH/ih);
+    const dw=iw*scale, dh=ih*scale;
+    const ix=M+(maxW-dw)/2, iy=y+6;
+    try{ doc.addImage(snap.plano.data,'JPEG',ix,iy,dw,dh); }catch(e){}
+  }
+
   const pages=doc.internal.getNumberOfPages();
   for(let p=1;p<=pages;p++){ doc.setPage(p); doc.setFont('helvetica','normal'); doc.setFontSize(8); doc.setTextColor(140,150,160);
-    doc.text('Proyecto Cochamó — Reporte de avance   |   Página '+p+' de '+pages,W/2,H-8,{align:'center'}); }
+    doc.text('Proyecto Cochamó — Supervisión de vivienda   |   Página '+p+' de '+pages,W/2,H-8,{align:'center'}); }
 
-  const fname='Avance_'+(snap.id||'vivienda')+'_'+(snap.beneficiario||'').replace(/\s+/g,'_').slice(0,20)+'_'+(snap.fecha||'').replace(/[^0-9]/g,'').slice(0,8)+'.pdf';
+  const fname=('Supervision_'+(snap.id||'vivienda')+'_'+(snap.fecha||'').replace(/[^0-9]/g,'').slice(0,8)).replace(/\s+/g,'_')+'.pdf';
   doc.save(fname); toast('PDF generado ✓');
 }
 
-function nuevoReporte(){
-  if(!confirm('¿Comenzar un nuevo reporte? Se limpiará la pantalla (los guardados se conservan).'))return;
-  actual=nuevaEstructura();
+// ---------- Nueva ----------
+function nuevaInspeccion(){
+  if(!confirm('¿Comenzar una nueva supervisión? Se limpiará la pantalla actual (las guardadas se conservan).')) return;
+  actual=nuevaEstructura(); planoData=null;
   document.getElementById('idVivienda').value='';
-  document.getElementById('beneficiario').value='';
-  setFecha(); renderChecklist(); window.scrollTo({top:0,behavior:'smooth'}); toast('Listo para nueva vivienda');
+  document.getElementById('planoPreview').style.display='none';
+  document.getElementById('planoPreview').innerHTML='';
+  setFecha(); renderChecklist(); window.scrollTo({top:0,behavior:'smooth'}); toast('Lista para nueva vivienda');
 }
 
+// ---------- Respaldo ----------
 function exportAllJSON(){
   const blob=new Blob([JSON.stringify(getSaved())],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='respaldo_avance_cochamo_'+new Date().toISOString().slice(0,10)+'.json'; a.click(); toast('Respaldo descargado');
+  a.download='respaldo_cochamo_'+new Date().toISOString().slice(0,10)+'.json'; a.click(); toast('Respaldo descargado');
 }
 document.getElementById('restoreInput').onchange=e=>{
-  const file=e.target.files[0]; if(!file)return;
+  const file=e.target.files[0]; if(!file) return;
   const r=new FileReader();
   r.onload=ev=>{ try{ const data=JSON.parse(ev.target.result); if(!Array.isArray(data))throw 0;
     setSaved(getSaved().concat(data)); toast('Respaldo restaurado ('+data.length+')'); }
@@ -1099,15 +1165,12 @@ function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg
 function init(){
   try{
     setFecha(); renderChecklist(); renderSaved();
-    const idv=document.getElementById('idVivienda'), ben=document.getElementById('beneficiario');
-    const jefe=document.getElementById('jefe'), sector=document.getElementById('sector');
-    idv.oninput=actualizarProgreso; ben.oninput=actualizarProgreso;
-    try{ jefe.value=localStorage.getItem('avance_jefe')||''; }catch(e){}
-    try{ sector.value=localStorage.getItem('avance_sector')||''; }catch(e){}
-    jefe.oninput=()=>{ try{localStorage.setItem('avance_jefe',jefe.value)}catch(e){} };
-    sector.oninput=()=>{ try{localStorage.setItem('avance_sector',sector.value)}catch(e){} };
+    const insp=document.getElementById('inspector');
+    try{ insp.value=localStorage.getItem('cochamo_inspector')||''; }catch(e){}
+    insp.oninput=()=>{ try{localStorage.setItem('cochamo_inspector',insp.value)}catch(e){} actualizarProgreso(); };
+    document.getElementById('idVivienda').oninput=actualizarProgreso;
   }catch(err){
-    document.getElementById('checklist').innerHTML='<div class="card card-pad" style="border-color:#b3271e"><b style="color:#b3271e">Error al cargar</b><br><small>'+(err&&err.message?err.message:err)+'</small></div>';
+    document.getElementById('checklist').innerHTML='<div class="card card-pad" style="border-color:#b3271e"><b style="color:#b3271e">Error al cargar el checklist</b><br><small>'+(err&&err.message?err.message:err)+'</small></div>';
   }
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init); else init();
